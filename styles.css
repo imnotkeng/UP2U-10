@@ -1,0 +1,287 @@
+/* Neon Spill - Flood Fill Puzzle Game */
+
+/* CSS Variables for Neon Color Palette */
+:root {
+  --color-hot-pink: #FF006E;
+  --color-cyan: #00F5FF;
+  --color-lime: #39FF14;
+  --color-purple: #BF00FF;
+  --color-yellow: #FFFF00;
+  --color-orange: #FF6600;
+
+  --bg-color: #0a0a0a;
+  --text-color: #ffffff;
+  --overlay-bg: rgba(0, 0, 0, 0.85);
+}
+
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Main Container */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  max-width: 800px;
+  width: 100%;
+}
+
+/* Header */
+header h1 {
+  font-size: 3rem;
+  text-align: center;
+  background: linear-gradient(90deg,
+    var(--color-hot-pink),
+    var(--color-cyan),
+    var(--color-lime),
+    var(--color-purple),
+    var(--color-yellow),
+    var(--color-orange)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+}
+
+/* Game Info */
+.game-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.instructions {
+  text-align: center;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+}
+
+.instructions p {
+  margin: 4px 0;
+}
+
+.instructions strong {
+  color: var(--color-cyan);
+}
+
+.moves-display {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#move-counter {
+  color: var(--color-cyan);
+}
+
+/* Game Board - CSS Grid */
+.game-board {
+  display: grid;
+  grid-template-columns: repeat(14, 1fr);
+  gap: 2px;
+  background-color: #1a1a1a;
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.2);
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 1;
+}
+
+/* Individual Tiles */
+.tile {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.tile:hover {
+  filter: brightness(1.2);
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+/* Controls Section */
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+/* Selected Color Display */
+.selected-color-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+}
+
+.selected-color-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  transition: background-color 0.3s ease;
+}
+
+/* Color Picker */
+.color-picker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* Color Buttons */
+.color-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.color-btn.selected {
+  border: 4px solid white;
+  box-shadow: 0 0 20px currentColor;
+  transform: scale(1.1);
+}
+
+.color-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 20px currentColor;
+}
+
+.color-btn:active {
+  transform: scale(0.95);
+}
+
+/* Restart Button */
+.restart-btn {
+  padding: 12px 32px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  background: linear-gradient(135deg, var(--color-purple), var(--color-hot-pink));
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.restart-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
+}
+
+.restart-btn:active {
+  transform: scale(0.95);
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--overlay-bg);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.overlay-content {
+  text-align: center;
+  padding: 40px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+  box-shadow: 0 0 40px rgba(0, 245, 255, 0.3);
+}
+
+.overlay-content h2 {
+  font-size: 3rem;
+  margin-bottom: 24px;
+}
+
+.overlay-content.win h2 {
+  color: var(--color-lime);
+  text-shadow: 0 0 20px var(--color-lime);
+}
+
+.overlay-content.lose h2 {
+  color: var(--color-hot-pink);
+  text-shadow: 0 0 20px var(--color-hot-pink);
+}
+
+/* Play Again Button */
+.play-again-btn {
+  padding: 16px 40px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  background: linear-gradient(135deg, var(--color-cyan), var(--color-purple));
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.play-again-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+}
+
+.play-again-btn:active {
+  transform: scale(0.95);
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  header h1 {
+    font-size: 2rem;
+  }
+
+  .moves-display {
+    font-size: 1.2rem;
+  }
+
+  .color-btn {
+    width: 50px;
+    height: 50px;
+  }
+
+  .overlay-content h2 {
+    font-size: 2rem;
+  }
+}
